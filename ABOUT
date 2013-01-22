@@ -1,0 +1,6 @@
+The stellar evolution tracks contained within the directory structure
+were utilized in the ApJ paper: Feiden & Dotter (2013). Not all models
+are explicitly illustrated in the paper, but are provided here for 
+future use and for use with the mass/metallicity interpolator.
+
+Additional models may be provided upon request. 

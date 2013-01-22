@@ -1,0 +1,176 @@
+README for DSEP k2 stellar mass tracks
+    Version 1.0
+    22 Jan 2013
+
+Contacts:
+    Greg Feiden  <gregory.a.feiden.gr@dartmouth.edu>
+    Aaron Dotter <aaron.dotter@gmail.com>
+
+Updates: -
+    
+------------------------------------------------------------------------
+The Dartmouth Stellar Evolution Database is located on the web at
+              http://stellar.dartmouth.edu/models/
+              
+The files within this directory structure contain model tracks generated
+using the Dartmouth Stellar Evolution Program (DSEP). All models have 
+been evolved to an age of 10 Gyr. Metallicities are GS98 scaled-solar, 
+thus [Fe/H] is identical to [M/H] in this instance. Helium abundances 
+are computed using the relation
+                      Y = Y_prim + 1.6*Z
+where Y_prim = 0.245, Z is the current heavy element mass fraction, and
+Y is the current helium mass fraction.
+
+Microphysics incorporated in the models include the FreeEOS equation of
+state solver (http://freeeos.sourceforge.net) in the EOS4 configuration,
+high-temperature OPAL (Iglesias & Rogers '96) and low-temperature
+Ferguson et al. ('05) opacities, and helium and heavy element diffusion
+according to the prescription of Thoul et al. ('94). Surface boundary
+conditions were defined using the PHOENIX AMES-COND (Hauschildt et al.
+'99) models atmospheres attached at T=Teff. Nuclear reaction cross-
+sections (S-values) were adopted from the Solar Fusion II review 
+(Adelberger et al. '10) which did not differ largely from Solar Fusion I
+(Adelberger et al. '98) for the p-p chain.
+
+Further details pertraining to the physics incorporated in the models 
+may be found in Feiden & Dotter (2013), and references therein.
+
+------------------------------------------------------------------------
+Directory key:
+
+   |-- doc         :: Documentation for the interpolation software
+   |
+   |-- man         :: ApJ Letter manuscript
+   |
+   |-- src         :: Mass track interpolation routine
+   | |
+   | `---- k2age   :: Mass track interpolation package
+   |
+   `-- trk         :: Model tracks
+     |
+     |---- fehm100 :: [Fe/H] = -1.00
+     |---- fehm50  :: [Fe/H] = -0.50
+     |---- fehm30  :: [Fe/H] = -0.30
+     |---- fehm10  :: [Fe/H] = -0.10
+     |---- fehp0   :: [Fe/H] =  0.00
+     |---- fehp10  :: [Fe/H] = +0.10
+     |---- fehp20  :: [Fe/H] = +0.20
+     |---- fehp30  :: [Fe/H] = +0.30
+     |---- mixl    :: Modified alpha_MLT
+     |   |
+     |   |---- a05 :: a = 0.5
+     |   |---- a10 :: a = 1.0
+     |   `---- a30 :: a = 3.0
+     |
+     |---- mody    :: Modified helium abundance (Y = 0.33)
+     `---- surp    :: Surface pressure
+         |
+         |---- m20 :: -20% Psurf
+         `---- p20 :: +20% Psurf
+
+------------------------------------------------------------------------
+All mass tracks have the same file structure: two header lines followed 
+by the parameters at each evolutionary step. The output files consist of
+thirteen (13) space-delimited columns. 
+
+File header, line 1:
+       M  :: Mass of model in solar masses
+       X  :: Hydrogen mass fraction
+       Z  :: Heavy element mass fraction
+    COMP  :: Heavy element composition
+  [a/Fe]  :: Alpha element abundance relative to iron
+    MIXL  :: Convective mixing-length, alpha_MLT
+   TURBT  :: Log10 of reference temperature for turbulent diffusion
+     CCO  :: Convective core overshoot parameter
+     
+File header, line 2:
+     Age  :: (1)  Age of model (yrs)
+   Log T  :: (2)  Log10 of effective temperature
+   Log g  :: (3)  Log10 of surface gravity
+   Log L  :: (4)  Log10 of bolometric luminosity
+   Log R  :: (5)  Log10 of stellar radius
+  Y_core  :: (6)  Helium mass fraction in the stellar core
+  Z_core  :: (7)  Heavy element mass fraction in the stellar core
+   (Z/X)  :: (8)  (Z/X) at the stellar surface
+     L_H  :: (9)  Luminosity of hydrogen fusion
+    L_He  :: (10) Luminosity of helium fusion
+    M_He  :: (11) Mass of helium core
+    M_CO  :: (12) Mass of carbon/oxygen core
+     k_2  :: (13) Interior structure constant
+
+------------------------------------------------------------------------
+Interpolation routines are provided in the 'src/' directory for deriving
+age-k2 relations for arbitrary mass/metallicity combinations, within the
+given limits. The boundaries are:
+
+                       0.15  <  M/Msun  <  0.75
+                      -1.00  <  [Fe/H]  <  0.30
+
+and are dependent on the mass tracks provided in the enclosed directory
+structure. Extensions in both are possible with the inclusion of more 
+tracks.
+
+The script has two external Python dependencies: SciPy and Numpy, both
+of which are freely available. Note, the script was written and tested
+for Python version 2.7 and is not suitable for Python 3.0.
+
+A test is available to ensure the Python script is working properly and 
+to ensure that the system you are using has the correct dependencies.
+While not required for the modules to run, it might save you from having 
+a massive headache if other packages are missing. To run, 
+
+  ~$ chmod +x test_interp
+  ~$ ./test_interp
+
+This will also give you an idea of how long it takes to run the script 
+on your machine. There are multiple ways of running the actual interp
+script. 
+
+  1) Add the 'src/' directory to the Python Path environment variable. 
+     For Linux and Unix users, this is an addition to your .bashrc or 
+     .cshrc file:
+     
+        bash:
+         export PYTHONPATH=$HOME/directory/tracks/src//:$PYTHONPATH
+
+        csh:
+         setenv PYTHONPATH=($PYTHONPATH $HOME/directory/tracks/src/)
+         
+      Performing this method will allow you to call the interpolation
+      scripts from any directory where you launch python. 
+      
+        ~$ python  
+        >> from k2age import *
+      
+  2) Call primary driver script, interp.py.
+        
+        ~$ cd $HOME/directory/tracks/
+        ~$ python interp.py *mass* *[Fe/H]*
+        
+        or
+        
+        ~$ cd $HOME/directory/tracks/
+        ~$ python
+        >> import interp
+        >> interp.interp(*mass*, *[Fe/H]*)
+  
+  3) Finally, you can directly call the necessary subroutines by cd-ing 
+     into the source directory.
+     
+        ~$ cd $HOME/directory/tracks/src/
+        ~$ python k2_interp.py *mass* *[Fe/H]*
+        
+        or
+        
+        ~$ cd $HOME/directory/tracks/src/
+        ~$ python
+        >> import k2_interp as k2int
+        >> k2int.mass_feh_interp(*mass*, *[Fe/H]*)
+     
+In the above calls, *mass* is the mass in solar masses and *[Fe/H]* is 
+the metallicity in dex. Currently, the script is written for the 
+enclosed directory structure and requires the given structure to locate 
+the mass tracks.
+
+------------------------------------------------------------------------
+END OF FILE

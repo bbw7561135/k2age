@@ -1,0 +1,5 @@
+\form#0:$c_{2, i}$
+\form#1:$c_{2,\, i} = \left[\left(\frac{\Omega_i}{\Omega_K}\right)^2 \left(1 + \frac{m_{3-i}}{m_i}\right) f(e) + \frac{15 m_{3-i}}{m_i} g(e) \right]\left(\frac{R_i}{A}\right)^5$
+\form#2:$k_{2,\, i}$
+\form#3:$\overline{k_{2}} = \frac{c_{2,\,1}k_{2,\,1} + c_{2,\,2}k_{2,\,2}}{c_{2,\,1} + c_{2,\,2}}$
+\form#4:$\overline{k_{2}}$
