@@ -1,0 +1,129 @@
+#!/bin/bash
+#
+# Test script to confirm interpolation routine is working properly. This includes
+# diagnosing dependencies and setting the users python path automagically.
+#
+# author: Gregory A. Feiden :: <gregory.a.feiden.gr@dartmouth.edu>
+#   date: 23 Jan 2013
+#
+# update: -
+#
+echo 'checking existence of various dependencies.'
+echo
+
+echo '...k2age.binary'
+if [ ! -f ./src/k2age/binary.py ]
+then
+    echo '......missing'
+    flag="1"
+else
+    echo '......found'
+    flag="0"
+fi
+echo
+
+echo '...k2age.star'
+if [ ! -f ./src/k2age/star.py ]
+then
+    echo '......missing'
+    flag="1"
+else
+    echo '......found'
+fi
+echo
+
+echo '...k2age.tracks'
+if [ ! -f ./src/k2age/tracks.py ]
+then
+    echo '......missing'
+    flag="1"
+else
+    echo '......found'
+fi
+echo
+
+# check that python exists and set python path
+pydir=$(command -v python)
+if [ "" == "$pydir" ]
+then
+    echo '......python not found'
+    flag="1"
+    exit
+fi
+safe_pattern=$(printf "%s\n" "#!$pydir" | sed 's/[][\.*^$/]/\\&/g')
+sed '1s/.*/'${safe_pattern}'/g' ./defaultBinary.py > t1.py
+mv t1.py ./defaultBinary.py
+
+# check python version
+pyver=$($pydir -c 'import sys; print(sys.version_info[:])')
+echo '...python version', $pyver
+pyver=$($pydir -c 'import sys; print(sys.version_info[0])')
+if [ "$pyver" -lt "3" ]
+then
+    echo '......good'
+else
+    echo '......need version less than 3'
+    flag="1"
+fi
+echo
+
+echo '...package: NumPy'
+npytest=$($pydir -c 'import numpy')
+if [ "" == "$npytest" ]
+then
+    echo '......installed'
+else
+    echo '......missing'
+    flag="1"
+fi
+echo
+
+echo '...package: SciPy'
+spytest=$($pydir -c 'import scipy')
+if [ "" == "$spytest" ]
+then
+    echo '......installed'
+else
+    echo '......missing'
+    flag="1"
+fi
+echo
+
+if [ $flag == "1" ]
+then
+    echo 'WARNING: Pakcages missing. Please install the required packages.'
+    exit
+fi
+
+echo '...gnuplot'
+gplt=$(command -v gnuplot)
+if [ "" == "$gplt" ]
+then
+    echo '......not found'
+    flag="1"
+else
+    echo '......found'
+fi
+
+if [ $flag == "0" ] 
+then
+    echo 'Testing interpolation script'
+    echo
+    chmod +x defaultBinary.py
+    time ./defaultBinary.py 0.55 0.25 0.62 0.41 0.0 0.2 3.0
+
+    gnuplot -p <(echo "set xrange [6.0:10.0]; set size square; set logscale x; 
+       set xlabel 'log_{10}(age) (yr)'; set ylabel 'k_2';
+       plot './trk/usr_int/binary_test.out' u 1:2 w points lt 0 pt 7 title 'Pre-made track',\
+       './trk/usr_int/binary_star_track.out' u 1:2 w lines lt 3 lw 2 title 'Test track';")
+    echo
+    echo 'You should see the solid line lying directly on top of the points. If so,'
+    echo 'then the program is working properly. Congratulations!'
+else
+    echo
+    echo 'All required packages installed, but interpolation test may not'
+    echo 'proceed without Gnuplot.'
+fi
+echo
+
+rm ./trk/usr_int/binary_star_track.out
