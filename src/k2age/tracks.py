@@ -3,10 +3,12 @@
 import logging
 import numpy as np
 import scipy.interpolate as sint
+from os.path import dirname
+import star
 
-logger = logging.getLogger('tracks')
+logger = logging.getLogger(__name__)
 
-__all__ = [DsepModel]
+__all__ = ['DsepModel']
 
 class DsepModel(object):
     
@@ -41,7 +43,7 @@ class DsepModel(object):
         self.ages = [10.**x for x in self.log_ages]
         
         # directory location of model tracks
-        self.directory = '../trk/'
+        self.directory = dirname(star.__file__) + '/../../trk/'
         
     ## Get model mass track by interpolating in model grid.
     #
@@ -60,43 +62,43 @@ class DsepModel(object):
         # interpolate in mass at each metallicity
         #--- low metallicity
         filename = self.getFileName(mass=self.mass_list[mass_idx],
-                               metallicity=self.feh_list[feh_idx])
+                                    metallicity=self.feh_list[feh_idx])
         mass_lo_feh_lo = self.loadMassTrack(filename=filename)
         
         filename = self.getFileName(mass=self.mass_list[mass_idx + 1],
-                               metallicity=self.feh_list[feh_idx])
+                                    metallicity=self.feh_list[feh_idx])
         mass_hi_feh_lo = self.loadMassTrack(filename=filename)
                                      
         mass_feh_lo = self.massTrackInterpolate(mass_track_1=mass_lo_feh_lo,
-                                           mass_track_2=mass_hi_feh_lo,
-                                           x_1=self.mass_list[mass_idx],
-                                           x_2=self.mass_list[mass_idx+1],
-                                           x_new=mass,
-                                           set_equal_grid=True)
+                                                mass_track_2=mass_hi_feh_lo,
+                                                x_1=self.mass_list[mass_idx],
+                                                x_2=self.mass_list[mass_idx+1],
+                                                x_new=mass,
+                                                set_equal_grid=True)
                                            
         #--- high metallicity                               
         filename = self.getFileName(mass=self.mass_list[mass_idx],
-                               metallicity=self.feh_list[feh_idx + 1])
+                                    metallicity=self.feh_list[feh_idx + 1])
         mass_lo_feh_hi = self.loadMassTrack(filename=filename)
         
         filename = self.getFileName(mass=self.mass_list[mass_idx + 1],
-                               metallicity=self.feh_list[feh_idx + 1])
+                                    metallicity=self.feh_list[feh_idx + 1])
         mass_hi_feh_hi = self.loadMassTrack(filename=filename)
                                      
         mass_feh_hi = self.massTrackInterpolate(mass_track_1=mass_lo_feh_hi,
-                                           mass_track_2=mass_hi_feh_hi,
-                                           x_1=self.mass_list[mass_idx],
-                                           x_2=self.mass_list[mass_idx+1],
-                                           x_new=mass,
-                                           set_equal_grid=True)
+                                                mass_track_2=mass_hi_feh_hi,
+                                                x_1=self.mass_list[mass_idx],
+                                                x_2=self.mass_list[mass_idx+1],
+                                                x_new=mass,
+                                                set_equal_grid=True)
                                            
         # interpolate in metallicity
         new_track = self.massTrackInterpolate(mass_track_1=mass_feh_lo, 
-                                         mass_track_2=mass_feh_hi,
-                                         x_1=self.feh_list[feh_idx],
-                                         x_2=self.feh_list[feh_idx+1],
-                                         x_new=metallicity,
-                                         set_equal_grid=False)          
+                                              mass_track_2=mass_feh_hi,
+                                              x_1=self.feh_list[feh_idx],
+                                              x_2=self.feh_list[feh_idx+1],
+                                              x_new=metallicity,
+                                              set_equal_grid=False)          
         return new_track
         
     ## Load requested mass track into an array.

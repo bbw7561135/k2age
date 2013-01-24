@@ -3,10 +3,12 @@
 import logging
 import numpy as np
 import scipy.interpolate as sint
+from os.path import dirname
+import star
 
-logger = logging.getLogger('binary')
+logger = logging.getLogger(__name__)
 
-__all__ = [Binary]
+__all__ = ['Binary']
 
 class Binary(object):
     
@@ -77,12 +79,12 @@ class Binary(object):
         
         # Compute c_2,1
         c21 = (omega_ratio[0]*(1. + self.secondary_mass/self.primary_mass)*f + \
-              15.*self.secondary_mass*g/self.primary_mass) * \
-              (self.primary_radius/self.semi_major_axis)**5
+               15.*self.secondary_mass*g/self.primary_mass) * \
+               (self.primary_radius/self.semi_major_axis)**5
         # Compute c_2,2
         c22 = (omega_ratio[1]*(1. + self.primary_mass/self.secondary_mass)*f + \
-              15.*g*self.primary_mass/self.secondary_mass) * \
-              (self.secondary_radius/self.semi_major_axis)**5
+               15.*g*self.primary_mass/self.secondary_mass) * \
+               (self.secondary_radius/self.semi_major_axis)**5
               
         return c21, c22
     
@@ -114,7 +116,8 @@ class Binary(object):
     #  @param k2_track List of k2 values to be output.
     def printToFile(self, ages=None, k2_track=None):
         
-        filename = './binary_star_track.out'
+        directory = dirname(star.__file__) + '/../../trk/usr_int/'
+        filename = directory + 'binary_star_track.out'
         fout = open(filename, 'w')
         
         for i in range(len(ages)):

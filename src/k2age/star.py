@@ -2,9 +2,9 @@
 #
 import logging
 
-logger = logging.getLogger('star')
+logger = logging.getLogger(__name__)
 
-__all__ = [Star]
+__all__ = ['Star']
 
 class Star(object):
     

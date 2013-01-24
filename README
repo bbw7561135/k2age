@@ -1,4 +1,4 @@
-README for DSEP k2 stellar mass tracks
+README for k2age analysis software.
     Version 1.0
     22 Jan 2013
 
@@ -33,16 +33,18 @@ sections (S-values) were adopted from the Solar Fusion II review
 (Adelberger et al. '98) for the p-p chain.
 
 Further details pertraining to the physics incorporated in the models 
-may be found in Feiden & Dotter (2013), and references therein.
+may be found in Feiden & Dotter (2013) and references therein.
 
 ------------------------------------------------------------------------
 Directory key:
 
    |-- doc         :: Documentation for the interpolation software
    |
-   |-- man         :: ApJ Letter manuscript
+   |-- examples    :: Examples of how to use the analysis software
    |
-   |-- src         :: Mass track interpolation routine
+   |-- man         :: Preprint of the manuscript accepted to ApJ
+   |
+   |-- src         :: Source files
    | |
    | `---- k2age   :: Mass track interpolation package
    |
@@ -85,10 +87,10 @@ File header, line 1:
      
 File header, line 2:
      Age  :: (1)  Age of model (yrs)
-   Log T  :: (2)  Log10 of effective temperature
-   Log g  :: (3)  Log10 of surface gravity
-   Log L  :: (4)  Log10 of bolometric luminosity
-   Log R  :: (5)  Log10 of stellar radius
+   Log T  :: (2)  Log10 of effective temperature (K)
+   Log g  :: (3)  Log10 of surface gravity (cgs)
+   Log L  :: (4)  Log10 of bolometric luminosity (Lsun)
+   Log R  :: (5)  Log10 of stellar radius (Rsun)
   Y_core  :: (6)  Helium mass fraction in the stellar core
   Z_core  :: (7)  Heavy element mass fraction in the stellar core
    (Z/X)  :: (8)  (Z/X) at the stellar surface
@@ -99,20 +101,23 @@ File header, line 2:
      k_2  :: (13) Interior structure constant
 
 ------------------------------------------------------------------------
-Interpolation routines are provided in the 'src/' directory for deriving
-age-k2 relations for arbitrary mass/metallicity combinations, within the
-given limits. The boundaries are:
+The interpolation software package k2age, written in Python, is provided 
+in the source directory, 'src/'. The package will assist in deriving the
+age of a binary system using the mean, weighted interior structure 
+constants of each star, as described in Feiden & Dotter (2013). Limits 
+for use of the routines are 
 
-                       0.15  <  M/Msun  <  0.75
-                      -1.00  <  [Fe/H]  <  0.30
+                      0.15  <  M/Msun  <  0.75
+                     -1.00  <  [Fe/H]  <  0.30
 
 and are dependent on the mass tracks provided in the enclosed directory
-structure. Extensions in both are possible with the inclusion of more 
-tracks.
+structure. Extensions in both mass and metallicity are possible with the 
+inclusion of more tracks. However, caution is urged if one wishes to 
+extend the upper limit on the mass range.
 
-The script has two external Python dependencies: SciPy and Numpy, both
-of which are freely available. Note, the script was written and tested
-for Python version 2.7 and is not suitable for Python 3.0.
+The software has two external Python dependencies: SciPy and Numpy, both
+of which are freely available. Note, the software was written and tested
+for Python version 2.7 and is likely not compatible with Python 3.0.
 
 A test is available to ensure the Python script is working properly and 
 to ensure that the system you are using has the correct dependencies.
@@ -137,40 +142,44 @@ script.
          setenv PYTHONPATH=($PYTHONPATH $HOME/directory/tracks/src/)
          
       Performing this method will allow you to call the interpolation
-      scripts from any directory where you launch python. 
+      software from any directory where you launch python. 
       
         ~$ python  
         >> from k2age import *
+        
+      Once you have imported the k2age package, simply follow the guide
+      outlined in the example file, makeBinary.py, in the 'examples/'
+      directory. A quick overview of what that script does:
+         
+        -- Creates an object representative of the model tracks.
+        
+        -- Creates two stars, the primary and secondary, with particular
+           properties specified by the user.
+           
+        -- Extracts (interpolates) a mass track for each star for the
+           specific model set created earlier (here only DSEP).
+           
+        -- Create a binary system comprised of the two stars that were
+           created previously.
+        
+        -- Convolve the two stellar mass tracks into one single track 
+           that shows the evolution of the mean, weighted k2 value.
+           
+        -- Prints the results to a generic output file.
       
-  2) Call primary driver script, interp.py.
+  2) Call the pre-made driver script
         
-        ~$ cd $HOME/directory/tracks/
-        ~$ python interp.py *mass* *[Fe/H]*
-        
-        or
-        
-        ~$ cd $HOME/directory/tracks/
-        ~$ python
-        >> import interp
-        >> interp.interp(*mass*, *[Fe/H]*)
-  
-  3) Finally, you can directly call the necessary subroutines by cd-ing 
-     into the source directory.
-     
-        ~$ cd $HOME/directory/tracks/src/
-        ~$ python k2_interp.py *mass* *[Fe/H]*
-        
-        or
-        
-        ~$ cd $HOME/directory/tracks/src/
-        ~$ python
-        >> import k2_interp as k2int
-        >> k2int.mass_feh_interp(*mass*, *[Fe/H]*)
-     
-In the above calls, *mass* is the mass in solar masses and *[Fe/H]* is 
-the metallicity in dex. Currently, the script is written for the 
-enclosed directory structure and requires the given structure to locate 
-the mass tracks.
+        ~$ cd $HOME/directory/k2age/
+        ~$ python defaultBinary.py *mass_a* *mass_b* *radius_a* *radius_b* 
+                                   *metallicity* *eccentricity* *semi_major_axis*
+
+Take a look at the defaultBinary.py for a description of the individual
+variables. While the driver script defaultBinary.py works, it is not as 
+flexible compared to designing your own script similar to defaultBinary
+or the example makeBinary. There are not many routines outside of what 
+is contained in makeBinary, but as the software develops, more will be 
+available. Currently, the software is written for the enclosed directory 
+structure and requires the given structure to locate the mass tracks.
 
 ------------------------------------------------------------------------
 END OF FILE
