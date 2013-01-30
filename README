@@ -122,7 +122,27 @@ for Python version 2.7 and is likely not compatible with Python 3.0.
 A test is available to ensure the Python script is working properly and 
 to ensure that the system you are using has the correct dependencies.
 While not required for the modules to run, it might save you from having 
-a massive headache if other packages are missing. To run, 
+a massive headache if other packages are missing. 
+
+Before you can run the test or any of the other code, you need to make
+sure that Python can find the module.  A simple way to do this is to
+add the src directory in this package to your PYTHONPATH environment
+variable.
+
+Add the 'src/' directory to the Python Path environment variable. For
+Linux and Unix users, this is an addition to your .bashrc or .cshrc 
+file:
+     
+        bash:
+         export PYTHONPATH=$HOME/directory/tracks/src//:$PYTHONPATH
+
+        csh:
+         setenv PYTHONPATH=($PYTHONPATH $HOME/directory/tracks/src/)
+         
+Performing this method will allow you to call the interpolation software 
+from any directory where you launch python. 
+
+To run the test script:
 
   ~$ chmod +x test_interp
   ~$ ./test_interp
@@ -131,18 +151,8 @@ This will also give you an idea of how long it takes to run the script
 on your machine. There are multiple ways of running the actual interp
 script. 
 
-  1) Add the 'src/' directory to the Python Path environment variable. 
-     For Linux and Unix users, this is an addition to your .bashrc or 
-     .cshrc file:
-     
-        bash:
-         export PYTHONPATH=$HOME/directory/tracks/src//:$PYTHONPATH
-
-        csh:
-         setenv PYTHONPATH=($PYTHONPATH $HOME/directory/tracks/src/)
-         
-      Performing this method will allow you to call the interpolation
-      software from any directory where you launch python. 
+  1) To see that it works interactively, start the python interpreter
+     and import the k2age module.
       
         ~$ python  
         >> from k2age import *
